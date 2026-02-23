@@ -167,6 +167,7 @@ mainContainer.addEventListener("click",function(event){
  
 
     }
+
 })
 
 function renderInterView(){
