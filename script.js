@@ -1,5 +1,6 @@
 let interViewList = [];
 let rejectList = [];
+let currentStatus = "all-filter-btn";
 
 let totals = document.getElementById("total");
 let interviewCount = document.getElementById("interviewCount");
@@ -18,11 +19,26 @@ const mainContainer = document.querySelector("main");
 
  const filterSection = document.getElementById("filterd-section");
 
+ const job = document.getElementById("job");
+
 
 function  calculateCount (){
     totals.innerText = allCardSection.children.length;
     interviewCount.innerText = interViewList.length;
     rejectCount.innerText = rejectList.length;
+
+    if(currentStatus == "all-filter-btn" ){
+        job.innerText = `
+           ${allCardSection.children.length} of ${allCardSection.children.length} jobs`;
+    }
+   else if(currentStatus == "interview-filter-btn" ){
+        job.innerText = `
+           ${interViewList.length} of ${allCardSection.children.length} jobs`;
+    }
+   else if(currentStatus == "reject-filter-btn" ){
+        job.innerText = `
+           ${rejectList.length} of ${allCardSection.children.length} jobs`;
+    }
 }
 calculateCount();
 
@@ -43,6 +59,7 @@ function toggleStyle (id){
     // console.log(id);
 
     const selected = document.getElementById(id);
+        currentStatus = id;
     // console.log(selected);
 
     // adding btn-primary for current button
@@ -54,10 +71,17 @@ function toggleStyle (id){
     if(id == "interview-filter-btn"){
         allCardSection.classList.add("hidden");
         filterSection.classList.remove("hidden");
+        renderInterView();
     }else if(id == "all-filter-btn"){
         allCardSection.classList.remove("hidden");
         filterSection.classList.add("hidden");
+    }else if(id == "reject-filter-btn"){
+        allCardSection.classList.add("hidden");
+        filterSection.classList.remove("hidden");
+        renderRejected();
     }
+
+    calculateCount();
     
 }
 
@@ -81,7 +105,7 @@ mainContainer.addEventListener("click",function(event){
             plantName,
             latinName,
             stu,
-            status:"iNTERVIEW",
+            status:"INTERVIEW",
             notes
         }
 
@@ -92,13 +116,19 @@ mainContainer.addEventListener("click",function(event){
         }
         // console.log(interviewList);
 
+              rejectList=rejectList.filter(item => item.plantName != cardInfo.plantName);
+
         calculateCount();
 
-        renderInterView();
+        if(currentStatus == "reject-filter-btn"){
+            renderRejected();
+        }
 
 
     }
-    if(event.target.classList.contains("reject-btn")){ 
+
+
+   else if(event.target.classList.contains("reject-btn")){ 
         const parentNode = event.target.parentNode.parentNode;
         // console.log(parentNode);
 
@@ -119,25 +149,48 @@ mainContainer.addEventListener("click",function(event){
             notes
         }
 
-        const plantExist = interViewList.find(item => item.plantName == cardInfo.plantName);
+        const plantExist = rejectList.find(item => item.plantName == cardInfo.plantName);
 
         if(!plantExist){
             rejectList.push(cardInfo);
         }
         // console.log(interviewList);
 
+            interViewList=interViewList.filter(item => item.plantName != cardInfo.plantName);
+
+            if(currentStatus == "interview-filter-btn" ){
+                renderInterView();
+            }
+
         calculateCount();
 
-         renderRejected();
+ 
 
     }
 })
 
 function renderInterView(){
     filterSection.innerHTML = ' ' ;
+
+    if(interViewList.length == 0){
+        filterSection.innerHTML = `
+        <div class="text-center border border-l-purple-500 border-r-amber-500 border-t-blue-900 border-b-red-700  rounded-2xl   p-4 md:p-8 shadow-xl/30  ring-2 mb-8 md:h-145 
+        flex items-center justify-center flex-col">
+        
+        
+        <img src="jobs.png" alt="Try again" class="text-center w-[200px] mx-auto ">
+
+         <h1 class="text-5xl font-bold mb-7">No Jobs available</h1>
+
+         <p class ="text-2xl text-gray-500">Check back home for new job operation</P>
+
+
+        </div>
+        `
+    }
     for(inter of interViewList){
         let div = document.createElement("div");
-
+        
         div.innerHTML = `
         
           <div class="flex flex-col md:flex-row  gap-6 justify-between border border-l-purple-500 border-r-amber-500 border-t-blue-900 border-b-red-700  rounded-2xl   p-4 md:p-8 shadow-xl/30  ring-2">
@@ -177,7 +230,26 @@ function renderInterView(){
 }
 function renderRejected(){
     filterSection.innerHTML = ' ' ;
-    for(reject of interViewList){
+
+      if(rejectList.length == 0){
+        filterSection.innerHTML = `
+        <div class="text-center border border-l-purple-500 border-r-amber-500 border-t-blue-900 border-b-red-700  rounded-2xl   p-4 md:p-8 shadow-xl/30  ring-2 mb-8 md:h-145 
+        flex items-center justify-center flex-col">
+        
+        
+        <img src="jobs.png" alt="Try again" class="text-center w-[200px] mx-auto ">
+
+         <h1 class="text-5xl font-bold mb-7">No Jobs available</h1>
+
+         <p class ="text-2xl text-gray-500">Check back home for new job operation</P>
+
+
+        </div>
+        `
+    }
+
+
+    for(reject of rejectList){
         let div = document.createElement("div");
 
         div.innerHTML = `
